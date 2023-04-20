@@ -1,3 +1,0 @@
-containers:
-  - name: cloudhw3-flask
-    image: jw4202/cloudhw3:init
