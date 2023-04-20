@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: flaskapp
-        image: jw4202/cloudhw3:working
+        image: jw4202/cloudhw3:health-route
         env:
         - name: MONGO_HOST
           value: "mongodb"
