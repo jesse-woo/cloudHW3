@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flaskapp
-        image: jw4202/cloudhw3:working
+        image: jw4202/cloudhw3:health-route
         env:
         - name: MONGO_HOST
           value: "mongodb"
@@ -24,6 +24,18 @@ spec:
           value: "production"
         ports:
         - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
   strategy:
     type: RollingUpdate
     rollingUpdate:
