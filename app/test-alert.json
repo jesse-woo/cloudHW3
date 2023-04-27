@@ -1,0 +1,15 @@
+[
+    {
+      "labels": {
+        "alertname": "TestAlert",
+        "service": "test-service",
+        "severity": "warning",
+        "instance": "test-instance"
+      },
+      "annotations": {
+        "description": "This is a test alert",
+        "summary": "Test alert"
+      },
+      "generatorURL": "http://example.com"
+    }
+]

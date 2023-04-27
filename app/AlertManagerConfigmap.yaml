@@ -1,35 +1,22 @@
-kind: ConfigMap
 apiVersion: v1
+kind: ConfigMap
 metadata:
   name: alertmanager-config
   namespace: monitoring
+  labels:
+    k8s-app: alertmanager
 data:
-  config.yml: |-
+  alertmanager.yml: |
     global:
-    templates:
-    - '/etc/alertmanager/*.tmpl'
-    route:
-      receiver: alert-emailer
-      group_by: ['alertname', 'priority']
-      group_wait: 10s
-      repeat_interval: 30m
-      routes:
-        - receiver: slack_demo
-        # Send severity=slack alerts to slack.
-          match:
-            severity: slack
-          group_wait: 10s
-          repeat_interval: 1m
- 
+      resolve_timeout: 1m
+      slack_api_url: 'https://hooks.slack.com/services/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'
     receivers:
-    - name: alert-emailer
-      email_configs:
-      - to: demo@devopscube.com
-        send_resolved: false
-        from: from-email@email.com
-        smarthost: smtp.eample.com:25
-        require_tls: false
-    - name: slack_demo
+    - name: 'slack-notificaions'
       slack_configs:
-      - api_url: https://hooks.slack.com/services/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sz4Qk
-        channel: '#devopscube-demo'
+      - channel: '#prometheus-alerts'
+        send_resolved: true
+    route:
+      group_interval: 5m
+      group_wait: 10s
+      receiver: 'slack-notificaions'
+      repeat_interval: 3h

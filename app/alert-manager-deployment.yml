@@ -3,46 +3,62 @@ kind: Deployment
 metadata:
   name: alertmanager
   namespace: monitoring
+  labels:
+    k8s-app: alertmanager
 spec:
-  replicas: 1
+  replicas: 2
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: alertmanager
+      k8s-app: alertmanager
   template:
     metadata:
-      name: alertmanager
       labels:
-        app: alertmanager
+        k8s-app: alertmanager
     spec:
       containers:
-      - name: alertmanager
-        image: prom/alertmanager:latest
-        args:
-          - "--config.file=/etc/alertmanager/config.yml"
-          - "--storage.path=/alertmanager"
-        ports:
-        - name: alertmanager
-          containerPort: 9093
-        resources:
-            requests:
-              cpu: 500m
-              memory: 500M
+        - name: prometheus-alertmanager
+          image: prom/alertmanager
+          imagePullPolicy: Always
+          args:
+            - --config.file=/etc/config/alertmanager.yml
+            - --storage.path=/data
+            - --web.listen-address=:9093
+            - --web.route-prefix=/
+            - --log.level=debug
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          ports:
+            - containerPort: 9093
+              name: http
+            - containerPort: 6783
+              name: mesh
+          readinessProbe:
+            httpGet:
+              path: /#/status
+              port: 9093
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+            - name: alertmanager-local-data
+              mountPath: "/data"
+              subPath: ""
+          resources:
             limits:
-              cpu: 1
-              memory: 1Gi
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/alertmanager
-        - name: templates-volume
-          mountPath: /etc/alertmanager-templates
-        - name: alertmanager
-          mountPath: /alertmanager
+              cpu: 10m
+              memory: 50Mi
+            requests:
+              cpu: 10m
+              memory: 50Mi
       volumes:
-      - name: config-volume
-        configMap:
-          name: alertmanager-config
-      - name: templates-volume
-        configMap:
-          name: alertmanager-templates
-      - name: alertmanager
-        emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: alertmanager-config
+        - name: alertmanager-local-data
+          emptyDir: {}
