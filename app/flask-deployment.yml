@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flaskapp
-        image: jw4202/cloudhw3:health-route
+        image: jw4202/cloudhw3:latest
         env:
         - name: MONGO_HOST
           value: "mongodb"
@@ -32,7 +32,7 @@ spec:
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /health
+            path: /ready
             port: 5000
           initialDelaySeconds: 5
           periodSeconds: 10

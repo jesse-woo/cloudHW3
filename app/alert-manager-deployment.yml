@@ -6,7 +6,7 @@ metadata:
   labels:
     k8s-app: alertmanager
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:

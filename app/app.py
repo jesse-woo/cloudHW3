@@ -10,6 +10,9 @@ client = MongoClient(mongodb_host, mongodb_port)    #Configure the connection to
 db = client.camp2016    #Select the database
 todos = db.todo #Select the collection
 
+is_healthy = True
+is_ready = True
+
 app = Flask(__name__)
 title = "TODO with Flask"
 heading = "ToDo Reminder"
@@ -121,7 +124,27 @@ def about():
 
 @app.route("/health")
 def health():
+    if not is_healthy:
+        return "Unhealthy", 500
     return "OK", 200
+
+@app.route("/unhealty")
+def unhealthy():
+    global is_healthy
+    is_healthy = False
+    return "Setting to unhealthy", 200
+
+@app.route("/ready")
+def ready():
+    if not is_ready:
+        return "Unready", 500
+    return "OK", 200
+
+@app.route("/unready")
+def unready():
+    global is_ready
+    is_ready = False
+    return "Setting to unready", 200
 
 if __name__ == "__main__":
 	env = os.environ.get('FLASK_ENV', 'development')

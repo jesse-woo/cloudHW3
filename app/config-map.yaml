@@ -10,13 +10,28 @@ data:
     groups:
     - name: devopscube demo alert
       rules:
-      - alert: High Pod Memory
-        expr: sum(container_memory_usage_bytes) > 1
+      # - alert: High Pod Memory
+      #   expr: sum(container_memory_usage_bytes) > 1
+      #   for: 1m
+      #   labels:
+      #     severity: slack
+      #   annotations:
+      #     summary: High Memory Usage
+      - alert: PodNotReady
+        expr: sum(kube_pod_container_status_ready{pod=~"flaskapp-.*"}) by (pod) < 1
         for: 1m
         labels:
           severity: slack
         annotations:
-          summary: High Memory Usage
+          summary: "Pod is not ready"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has not been ready for 1 minute."
+      # - alert: Low Ready Pod Count
+      #   expr: count(kube_pod_status_ready{condition="true",namespace="default"}) < 3
+      #   for: 30s
+      #   labels:
+      #     severity: slack
+      #   annotations:
+      #     summary: Low number of ready Pods in default namespace
   prometheus.yml: |-
     global:
       scrape_interval: 5s
